@@ -1,18 +1,22 @@
 package rip.diamond.moddedbukkit.block;
 
 import net.kyori.adventure.sound.Sound;
-import org.bukkit.Bukkit;
-import org.bukkit.GameEvent;
-import org.bukkit.GameMode;
-import org.bukkit.World;
+import org.apache.commons.lang3.Range;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
+import org.bukkit.block.data.type.Switch;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BoundingBox;
 import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
+import rip.diamond.moddedbukkit.util.BlockUtil;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
 
 import java.util.HashMap;
@@ -75,12 +79,31 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         Block toBeReplaced = clickedOn.isReplaceable() ? clickedOn : clickedOn.getRelative(blockFace);
         BlockData oldBlockData = toBeReplaced.getBlockData();
 
+        //Do not allow placing if the block player clicked on is interactable
+        if (BlockUtil.isInteractable(clickedOn)) {
+            return;
+        }
+        //Do not allow placing if y level is not within the world
+        if (!Range.between(toBeReplaced.getWorld().getMinHeight(), toBeReplaced.getWorld().getMaxHeight() - 1).contains(toBeReplaced.getY())) {
+            return;
+        }
+        //Do not allow placing if there's any entities standing near the block
+        if (toBeReplaced.getLocation().toCenterLocation().getNearbyLivingEntities(0.5, 0.5, 0.5).stream().anyMatch(entity -> !(entity instanceof Player p && p.getGameMode() == GameMode.SPECTATOR))) {
+            return;
+        }
+        //Do not allow placing if there's a block in that location, but isn't replaceable (For example: lever)
+        if (toBeReplaced.getType() != Material.AIR && !toBeReplaced.isReplaceable()) {
+            return;
+        }
+
         toBeReplaced.setBlockData(blockData);
 
         //Trigger BlockPlaceEvent, to support other plugins so player won't be able to place blocks in disallowed area
-        BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(toBeReplaced, toBeReplaced.getState(), clickedOn, itemStack, player, true, slot);
-        blockPlaceEvent.callEvent();
-        if (blockPlaceEvent.isCancelled()) {
+        BlockPlaceEvent event = new BlockPlaceEvent(toBeReplaced, toBeReplaced.getState(), clickedOn, itemStack, player, true, slot);
+        event.callEvent();
+
+        //If event is cancelled, we set back the block data to the old state, to prevent block changes
+        if (event.isCancelled()) {
             //Set back the block data to the old state
             toBeReplaced.setBlockData(oldBlockData);
             return;
