@@ -1,0 +1,11 @@
+name: "Example"
+main: "rip.diamond.moddedbukkit.ExamplePlugin"
+version: "1.0"
+authors: ["GoodestEnglish"]
+api-version: 1.21
+description: "Example of how to use ModdedBukkit API"
+depend:
+  - ModdedBukkit
+commands:
+  customitem:
+    aliases: ["ci"]
