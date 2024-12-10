@@ -9,7 +9,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.NoteBlock;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -86,7 +85,7 @@ public class ModdedBlockModuleListener implements Listener {
     }
 
     //Play default note block sound according to the block under
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler
     public void onPlay(final NotePlayEvent event) {
         Instrument instrument = event.getInstrument();
 

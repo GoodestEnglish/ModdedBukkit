@@ -5,19 +5,15 @@ import org.apache.commons.lang3.Range;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Openable;
-import org.bukkit.block.data.type.Switch;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.BoundingBox;
 import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
 import rip.diamond.moddedbukkit.util.BlockUtil;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
+import rip.diamond.moddedbukkit.util.SoundUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +73,7 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         Sound placeSound = block.getPlaceSound();
         World world = player.getWorld();
         Block toBeReplaced = clickedOn.isReplaceable() ? clickedOn : clickedOn.getRelative(blockFace);
+        Location toBeReplacedCenterLocation = toBeReplaced.getLocation().toCenterLocation();
         BlockData oldBlockData = toBeReplaced.getBlockData();
 
         //Do not allow placing if the block player clicked on is interactable and is not sneaking
@@ -88,7 +85,7 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
             return;
         }
         //Do not allow placing if there's any entities standing near the block
-        if (toBeReplaced.getLocation().toCenterLocation().getNearbyLivingEntities(0.5, 0.5, 0.5).stream().anyMatch(entity -> !(entity instanceof Player p && p.getGameMode() == GameMode.SPECTATOR))) {
+        if (toBeReplacedCenterLocation.getNearbyLivingEntities(0.5, 0.5, 0.5).stream().anyMatch(entity -> !(entity instanceof Player p && p.getGameMode() == GameMode.SPECTATOR))) {
             return;
         }
         //Do not allow placing if there's a block in that location, but isn't replaceable (For example: lever, skull)
@@ -114,7 +111,7 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         }
 
         player.swingHand(slot);
-        player.playSound(placeSound);
+        SoundUtil.playSound(toBeReplacedCenterLocation, placeSound);
         world.sendGameEvent(player, GameEvent.BLOCK_PLACE, toBeReplaced.getLocation().toVector());
     }
 }
