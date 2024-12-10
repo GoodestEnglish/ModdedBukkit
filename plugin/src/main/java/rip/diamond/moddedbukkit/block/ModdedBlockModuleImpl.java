@@ -79,8 +79,8 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         Block toBeReplaced = clickedOn.isReplaceable() ? clickedOn : clickedOn.getRelative(blockFace);
         BlockData oldBlockData = toBeReplaced.getBlockData();
 
-        //Do not allow placing if the block player clicked on is interactable
-        if (BlockUtil.isInteractable(clickedOn)) {
+        //Do not allow placing if the block player clicked on is interactable and is not sneaking
+        if (BlockUtil.isInteractable(clickedOn) && !player.isSneaking()) {
             return;
         }
         //Do not allow placing if y level is not within the world
@@ -91,7 +91,7 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         if (toBeReplaced.getLocation().toCenterLocation().getNearbyLivingEntities(0.5, 0.5, 0.5).stream().anyMatch(entity -> !(entity instanceof Player p && p.getGameMode() == GameMode.SPECTATOR))) {
             return;
         }
-        //Do not allow placing if there's a block in that location, but isn't replaceable (For example: lever)
+        //Do not allow placing if there's a block in that location, but isn't replaceable (For example: lever, skull)
         if (toBeReplaced.getType() != Material.AIR && !toBeReplaced.isReplaceable()) {
             return;
         }
