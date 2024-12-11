@@ -106,10 +106,10 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
             return;
         }
 
+        //Start making player place the block
         if (player.getGameMode() != GameMode.CREATIVE) {
             itemStack.subtract();
         }
-
         player.swingHand(slot);
         SoundUtil.playSound(toBeReplacedCenterLocation, placeSound);
         world.sendGameEvent(player, GameEvent.BLOCK_PLACE, toBeReplaced.getLocation().toVector());
