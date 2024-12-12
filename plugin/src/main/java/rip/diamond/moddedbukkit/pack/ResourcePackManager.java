@@ -5,6 +5,7 @@ import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
 import rip.diamond.moddedbukkit.block.ModdedBlock;
 import rip.diamond.moddedbukkit.block.ModdedBlockData;
 import rip.diamond.moddedbukkit.block.ModdedBlockModuleImpl;
+import rip.diamond.moddedbukkit.block.ModdedBlockType;
 import rip.diamond.moddedbukkit.item.ModdedItem;
 import rip.diamond.moddedbukkit.item.ModdedItemModuleImpl;
 import rip.diamond.moddedbukkit.util.FileUtil;
@@ -51,7 +52,7 @@ public class ResourcePackManager {
     private BlockState buildNoteBlockBlockState() {
         Map<String, MultiVariant> variants = new HashMap<>();
 
-        plugin.getModule(ModdedBlockModuleImpl.class).getBlocks().entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getKey)).forEachOrdered(entry -> {
+        plugin.getModule(ModdedBlockModuleImpl.class).getBlocks().entrySet().stream().filter(entry -> entry.getValue().getBlockType() == ModdedBlockType.NOTE_BLOCK).sorted(Comparator.comparingInt(Map.Entry::getKey)).forEachOrdered(entry -> {
             int id = entry.getKey();
             ModdedBlock block = entry.getValue();
             String details = ModdedBlockData.toBlockData(block.getBlockType(), id).getAsString().split("\\[")[1].split("]")[0];
@@ -79,6 +80,7 @@ public class ResourcePackManager {
             Key textureKey = item.getTextureKey();
             String itemName = item.getKey().value();
 
+            //If the namespace isn't minecraft, which means the item is displayed as a custom image, we have to create the image and import to the resource pack.
             if (!textureKey.namespace().equals("minecraft")) {
                 //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
                 FileUtil.extractFile(
