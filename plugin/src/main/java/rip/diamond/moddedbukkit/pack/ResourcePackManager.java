@@ -7,7 +7,9 @@ import rip.diamond.moddedbukkit.block.ModdedBlockData;
 import rip.diamond.moddedbukkit.block.ModdedBlockModuleImpl;
 import rip.diamond.moddedbukkit.item.ModdedItem;
 import rip.diamond.moddedbukkit.item.ModdedItemModuleImpl;
+import rip.diamond.moddedbukkit.util.FileUtil;
 import team.unnamed.creative.ResourcePack;
+import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.blockstate.BlockState;
 import team.unnamed.creative.blockstate.MultiVariant;
 import team.unnamed.creative.blockstate.Variant;
@@ -15,7 +17,9 @@ import team.unnamed.creative.central.CreativeCentral;
 import team.unnamed.creative.central.CreativeCentralProvider;
 import team.unnamed.creative.central.event.pack.ResourcePackGenerateEvent;
 import team.unnamed.creative.model.*;
+import team.unnamed.creative.texture.Texture;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +40,7 @@ public class ResourcePackManager {
         central.eventBus().listen(plugin, ResourcePackGenerateEvent.class, event -> {
             ResourcePack pack = event.resourcePack();
             BlockState blockState = buildNoteBlockBlockState();
-            Model paperModel = buildPaperModel();
+            Model paperModel = buildPaperModel(pack);
 
             pack.packMeta(9, "ModdedBukkit Generated ResourcePack");
             pack.blockState(blockState);
@@ -59,7 +63,7 @@ public class ResourcePackManager {
         return BlockState.of(Key.key("minecraft:note_block"), variants);
     }
 
-    private Model buildPaperModel() {
+    private Model buildPaperModel(ResourcePack pack) {
         Model.Builder paperModel = Model.model()
                 .key(Key.key("minecraft:item/paper"))
                 .parent(Key.key("minecraft:item/generated"))
@@ -72,8 +76,24 @@ public class ResourcePackManager {
 
         plugin.getModule(ModdedItemModuleImpl.class).getItems().entrySet().stream().sorted(Comparator.comparingInt(entry -> entry.getValue().getId())).forEachOrdered(entry -> {
             ModdedItem item = entry.getValue();
+            Key textureKey = item.getTextureKey();
+            String itemName = item.getKey().value();
 
-            paperModel.addOverride(ItemOverride.of(item.getTexture(), ItemPredicate.customModelData(item.getId())));
+            if (!textureKey.namespace().equals("minecraft")) {
+                //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
+                FileUtil.extractFile(
+                        item.getTextureResource(),
+                        new File("plugins/ModdedBukkit/assets/" + itemName + ".png")
+                );
+
+                Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + itemName + ".png")));
+                Model model = item.createModel();
+
+                pack.texture(texture);
+                pack.model(model);
+            }
+
+            paperModel.addOverride(ItemOverride.of(textureKey, ItemPredicate.customModelData(item.getId())));
         });
 
         return paperModel.build();

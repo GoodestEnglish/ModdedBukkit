@@ -7,7 +7,9 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
+import rip.diamond.moddedbukkit.ExamplePlugin;
 
+import java.io.InputStream;
 import java.util.List;
 
 public class DiamondDirtItem implements ModdedPlaceableItem {
@@ -20,8 +22,13 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
     }
 
     @Override
-    public Key getTexture() {
-        return Key.key("minecraft:item/dirt");
+    public Key getTextureKey() {
+        return Key.key("example:item/diamond_dirt");
+    }
+
+    @Override
+    public InputStream getTextureResource() {
+        return ExamplePlugin.INSTANCE.getResource("pack/textures/block/diamond_dirt.png");
     }
 
     @Override

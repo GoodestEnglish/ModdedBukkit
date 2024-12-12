@@ -6,4 +6,5 @@ object Variables {
 
     const val PAPER = "io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT"
     const val LOMBOK = "org.projectlombok:lombok:1.18.34"
+    const val CREATIVE_CENTRAL = "team.unnamed:creative-central-api:1.3.0"
 }

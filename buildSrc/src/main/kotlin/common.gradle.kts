@@ -15,6 +15,7 @@ repositories {
 dependencies {
     compileOnly(Variables.PAPER)
     compileOnly(Variables.LOMBOK)
+    compileOnly(Variables.CREATIVE_CENTRAL)
     annotationProcessor(Variables.LOMBOK)
     testCompileOnly(Variables.LOMBOK)
     testAnnotationProcessor(Variables.LOMBOK)

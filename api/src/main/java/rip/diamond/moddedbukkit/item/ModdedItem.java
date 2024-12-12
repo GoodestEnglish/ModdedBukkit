@@ -8,8 +8,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Range;
+import team.unnamed.creative.model.Model;
+import team.unnamed.creative.model.ModelTexture;
+import team.unnamed.creative.model.ModelTextures;
 
 import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.util.List;
 
 public interface ModdedItem {
@@ -18,7 +22,9 @@ public interface ModdedItem {
 
     Key getKey();
 
-    Key getTexture();
+    Key getTextureKey();
+
+    InputStream getTextureResource();
 
     /**
      * Get the ID of this ModdedItem.
@@ -45,6 +51,21 @@ public interface ModdedItem {
         itemStack.setItemMeta(meta);
 
         return itemStack;
+    }
+
+    default Model createModel() {
+        Key textureKey = getTextureKey();
+
+        return Model.model()
+                .parent(Key.key("minecraft:item/generated"))
+                .key(textureKey)
+                .textures(ModelTextures.builder()
+                        .layers(
+                                ModelTexture.ofKey(textureKey)
+                        )
+                        .build()
+                )
+                .build();
     }
 
 }
