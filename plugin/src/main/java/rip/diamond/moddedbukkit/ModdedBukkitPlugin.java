@@ -1,7 +1,9 @@
 package rip.diamond.moddedbukkit;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
+import rip.diamond.moddedbukkit.pack.ResourcePackManager;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
 
 import java.util.HashMap;
@@ -13,9 +15,12 @@ public class ModdedBukkitPlugin extends JavaPlugin implements ModdedBukkit {
 
     private final Map<Class<?>, ModdedModule> modules = new HashMap<>();
 
+    @Getter private ResourcePackManager resourcePackManager;
+
     @Override
     public void onEnable() {
         INSTANCE = this;
+        resourcePackManager = new ResourcePackManager(this);
     }
 
     @Override

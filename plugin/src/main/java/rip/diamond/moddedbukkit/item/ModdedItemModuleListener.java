@@ -41,7 +41,7 @@ public class ModdedItemModuleListener implements Listener {
         Action action = event.getAction();
 
         if (item instanceof ModdedPlaceableItem placeableItem && action == Action.RIGHT_CLICK_BLOCK) {
-            int blockID = placeableItem.getBlockID();
+            int blockID = placeableItem.getBlockId();
             ModdedBlockModuleImpl blockModule = plugin.getModule(ModdedBlockModuleImpl.class);
             ModdedBlock moddedBlock = blockModule.getBlock(blockID);
 

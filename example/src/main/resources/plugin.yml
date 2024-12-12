@@ -5,7 +5,8 @@ authors: ["GoodestEnglish"]
 api-version: 1.21
 description: "Example of how to use ModdedBukkit API"
 depend:
-  - ModdedBukkit
+  - "ModdedBukkit"
+  - "creative-central"
 commands:
   customitem:
     aliases: ["ci"]

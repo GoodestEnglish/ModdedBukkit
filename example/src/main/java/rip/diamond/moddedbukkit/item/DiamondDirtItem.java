@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 
@@ -16,6 +17,11 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
     @Override
     public Key getKey() {
         return KEY;
+    }
+
+    @Override
+    public @Range(from = 1, to = Integer.MAX_VALUE) int getId() {
+        return 1;
     }
 
     @Override
@@ -31,7 +37,7 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
     }
 
     @Override
-    public int getBlockID() {
+    public int getBlockId() {
         return 0;
     }
 }

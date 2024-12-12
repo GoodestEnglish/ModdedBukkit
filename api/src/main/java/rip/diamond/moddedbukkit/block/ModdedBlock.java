@@ -8,6 +8,8 @@ public interface ModdedBlock {
 
     Key getKey();
 
+    Key getTexture();
+
     int getId();
 
     ModdedBlockType getBlockType();

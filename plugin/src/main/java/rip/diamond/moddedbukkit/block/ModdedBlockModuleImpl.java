@@ -41,6 +41,11 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
     }
 
     @Override
+    public Map<Integer, ModdedBlock> getBlocks() {
+        return blocks;
+    }
+
+    @Override
     public ModdedBlock getBlock(int id) {
         return blocks.get(id);
     }

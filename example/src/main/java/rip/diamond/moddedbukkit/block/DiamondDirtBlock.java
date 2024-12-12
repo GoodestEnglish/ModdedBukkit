@@ -10,18 +10,23 @@ public class DiamondDirtBlock implements ModdedBlock {
     private final ModdedBlockHandler handler = new ModdedBlockHandler() {
         @Override
         public void onPlace(BlockPlaceEvent event) {
-            event.getPlayer().sendMessage("You placed " + getKey().toString());
+            event.getPlayer().sendMessage("You placed " + getKey().toString() + " (" + getBukkitBlockData().getAsString() + ")");
         }
 
         @Override
         public void onBreak(BlockBreakEvent event) {
-            event.getPlayer().sendMessage("You broke " + getKey().toString());
+            event.getPlayer().sendMessage("You broke " + getKey().toString() + " (" + getBukkitBlockData().getAsString() + ")");
         }
     };
 
     @Override
     public Key getKey() {
         return Key.key("example:diamond_dirt");
+    }
+
+    @Override
+    public Key getTexture() {
+        return Key.key("minecraft:block/gold_ore");
     }
 
     @Override

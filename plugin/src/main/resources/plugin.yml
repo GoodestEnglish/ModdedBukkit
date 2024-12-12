@@ -3,3 +3,4 @@ main: "rip.diamond.moddedbukkit.ModdedBukkitPlugin"
 version: "1.0"
 authors: ["GoodestEnglish"]
 api-version: 1.21
+depend: ["creative-central"]

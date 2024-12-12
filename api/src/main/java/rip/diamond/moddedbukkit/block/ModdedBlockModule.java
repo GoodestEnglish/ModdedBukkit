@@ -3,6 +3,8 @@ package rip.diamond.moddedbukkit.block;
 import org.bukkit.block.Block;
 import rip.diamond.moddedbukkit.ModdedModule;
 
+import java.util.Map;
+
 public interface ModdedBlockModule extends ModdedModule {
 
     /**
@@ -11,6 +13,8 @@ public interface ModdedBlockModule extends ModdedModule {
      * @param block The block which wants to be registered
      */
     void registerBlock(ModdedBlock block);
+
+    Map<Integer, ModdedBlock> getBlocks();
 
     ModdedBlock getBlock(int id);
 
