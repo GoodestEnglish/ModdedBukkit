@@ -20,6 +20,11 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
     }
 
     @Override
+    public Key getTexture() {
+        return Key.key("minecraft:item/dirt");
+    }
+
+    @Override
     public @Range(from = 1, to = Integer.MAX_VALUE) int getId() {
         return 1;
     }

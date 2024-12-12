@@ -20,11 +20,16 @@ public class ModdedItemModuleImpl implements ModdedItemModule {
         String key = item.getKey().asString();
 
         if (items.containsKey(key)) {
-            ModdedLogger.log("Cannot register block '" + key + "' because it is already registered");
+            ModdedLogger.log("Cannot register item '" + key + "' because it is already registered");
             return;
         }
 
         items.put(key, item);
+    }
+
+    @Override
+    public Map<String, ModdedItem> getItems() {
+        return items;
     }
 
     @Override

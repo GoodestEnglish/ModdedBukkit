@@ -18,6 +18,8 @@ public interface ModdedItem {
 
     Key getKey();
 
+    Key getTexture();
+
     /**
      * Get the ID of this ModdedItem.
      * <p>
@@ -37,6 +39,7 @@ public interface ModdedItem {
 
         meta.itemName(getName());
         meta.lore(getLore());
+        meta.setCustomModelData(getId());
         meta.getPersistentDataContainer().set(KEY, PersistentDataType.STRING, getKey().toString());
 
         itemStack.setItemMeta(meta);
