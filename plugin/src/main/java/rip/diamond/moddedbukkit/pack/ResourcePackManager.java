@@ -68,8 +68,10 @@ public class ResourcePackManager {
                 );
 
                 Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + blockName + ".png")));
+                Model model = block.createModel();
 
                 pack.texture(texture);
+                pack.model(model);
             }
 
             variants.put(details, MultiVariant.of(Variant.builder().model(textureKey).build()));
