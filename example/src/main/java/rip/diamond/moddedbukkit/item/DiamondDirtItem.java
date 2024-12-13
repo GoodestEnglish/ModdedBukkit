@@ -23,7 +23,7 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
 
     @Override
     public Key getTextureKey() {
-        return Key.key("example:item/diamond_dirt");
+        return Key.key("example:block/diamond_dirt");
     }
 
     @Override
