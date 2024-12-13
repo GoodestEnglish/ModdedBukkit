@@ -3,6 +3,7 @@ package rip.diamond.moddedbukkit.block;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.block.data.BlockData;
+import rip.diamond.moddedbukkit.pack.ModdedTexture;
 import team.unnamed.creative.model.Model;
 import team.unnamed.creative.model.ModelTexture;
 import team.unnamed.creative.model.ModelTextures;
@@ -10,13 +11,7 @@ import team.unnamed.creative.model.ModelTextures;
 import java.io.InputStream;
 import java.util.Map;
 
-public interface ModdedBlock {
-
-    Key getKey();
-
-    Key getTextureKey();
-
-    InputStream getTextureResource();
+public interface ModdedBlock extends ModdedTexture {
 
     int getId();
 
@@ -37,6 +32,7 @@ public interface ModdedBlock {
         return ModdedBlockData.toBlockData(getBlockType(), getId());
     }
 
+    @Override
     default Model createModel() {
         Key textureKey = getTextureKey();
 

@@ -8,23 +8,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Range;
+import rip.diamond.moddedbukkit.pack.ModdedTexture;
 import team.unnamed.creative.model.Model;
 import team.unnamed.creative.model.ModelTexture;
 import team.unnamed.creative.model.ModelTextures;
 
 import javax.annotation.Nullable;
-import java.io.InputStream;
 import java.util.List;
 
-public interface ModdedItem {
+public interface ModdedItem extends ModdedTexture {
 
     NamespacedKey KEY = new NamespacedKey("moddedbukkit", "key");
-
-    Key getKey();
-
-    Key getTextureKey();
-
-    InputStream getTextureResource();
 
     /**
      * Get the ID of this ModdedItem.
@@ -53,6 +47,7 @@ public interface ModdedItem {
         return itemStack;
     }
 
+    @Override
     default Model createModel() {
         Key textureKey = getTextureKey();
 

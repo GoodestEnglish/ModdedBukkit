@@ -57,21 +57,10 @@ public class ResourcePackManager {
             ModdedBlock block = entry.getValue();
             String details = ModdedBlockData.toBlockData(block.getBlockType(), id).getAsString().split("\\[")[1].split("]")[0];
             Key textureKey = block.getTextureKey();
-            String blockName = block.getKey().value();
 
             //If the namespace isn't minecraft, which means the item is displayed as a custom image, we have to create the image and import to the resource pack.
             if (!textureKey.namespace().equals("minecraft")) {
-                //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
-                FileUtil.extractFile(
-                        block.getTextureResource(),
-                        new File("plugins/ModdedBukkit/assets/" + blockName + ".png")
-                );
-
-                Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + blockName + ".png")));
-                Model model = block.createModel();
-
-                pack.texture(texture);
-                pack.model(model);
+                insertTextureAndModel(pack, block);
             }
 
             variants.put(details, MultiVariant.of(Variant.builder().model(textureKey).build()));
@@ -94,27 +83,33 @@ public class ResourcePackManager {
         plugin.getModule(ModdedItemModuleImpl.class).getItems().entrySet().stream().sorted(Comparator.comparingInt(entry -> entry.getValue().getId())).forEachOrdered(entry -> {
             ModdedItem item = entry.getValue();
             Key textureKey = item.getTextureKey();
-            String itemName = item.getKey().value();
 
             //If the namespace isn't minecraft, which means the item is displayed as a custom image, we have to create the image and import to the resource pack.
             if (!textureKey.namespace().equals("minecraft")) {
-                //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
-                FileUtil.extractFile(
-                        item.getTextureResource(),
-                        new File("plugins/ModdedBukkit/assets/" + itemName + ".png")
-                );
-
-                Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + itemName + ".png")));
-                Model model = item.createModel();
-
-                pack.texture(texture);
-                pack.model(model);
+                insertTextureAndModel(pack, item);
             }
 
             paperModel.addOverride(ItemOverride.of(textureKey, ItemPredicate.customModelData(item.getId())));
         });
 
         return paperModel.build();
+    }
+
+    private void insertTextureAndModel(ResourcePack pack, ModdedTexture moddedTexture) {
+        String name = moddedTexture.getKey().value();
+        Key textureKey = moddedTexture.getTextureKey();
+
+        //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
+        FileUtil.extractFile(
+                moddedTexture.getTextureResource(),
+                new File("plugins/ModdedBukkit/assets/" + name + ".png")
+        );
+
+        Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + name + ".png")));
+        Model model = moddedTexture.createModel();
+
+        pack.texture(texture);
+        pack.model(model);
     }
 
 }
