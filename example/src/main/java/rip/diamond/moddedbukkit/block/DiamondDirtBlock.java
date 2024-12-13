@@ -4,6 +4,9 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import rip.diamond.moddedbukkit.ExamplePlugin;
+
+import java.io.InputStream;
 
 public class DiamondDirtBlock implements ModdedBlock {
 
@@ -25,8 +28,13 @@ public class DiamondDirtBlock implements ModdedBlock {
     }
 
     @Override
-    public Key getTexture() {
-        return Key.key("minecraft:block/gold_ore");
+    public Key getTextureKey() {
+        return Key.key("example:block/diamond_dirt");
+    }
+
+    @Override
+    public InputStream getTextureResource() {
+        return ExamplePlugin.INSTANCE.getResource("pack/textures/block/diamond_dirt.png");
     }
 
     @Override

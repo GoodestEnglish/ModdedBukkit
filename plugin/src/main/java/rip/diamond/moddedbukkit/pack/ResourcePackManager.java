@@ -40,7 +40,7 @@ public class ResourcePackManager {
     private void listenToEvent() {
         central.eventBus().listen(plugin, ResourcePackGenerateEvent.class, event -> {
             ResourcePack pack = event.resourcePack();
-            BlockState blockState = buildNoteBlockBlockState();
+            BlockState blockState = buildNoteBlockBlockState(pack);
             Model paperModel = buildPaperModel(pack);
 
             pack.packMeta(9, "ModdedBukkit Generated ResourcePack");
@@ -49,16 +49,30 @@ public class ResourcePackManager {
         });
     }
 
-    private BlockState buildNoteBlockBlockState() {
+    private BlockState buildNoteBlockBlockState(ResourcePack pack) {
         Map<String, MultiVariant> variants = new HashMap<>();
 
         plugin.getModule(ModdedBlockModuleImpl.class).getBlocks().entrySet().stream().filter(entry -> entry.getValue().getBlockType() == ModdedBlockType.NOTE_BLOCK).sorted(Comparator.comparingInt(Map.Entry::getKey)).forEachOrdered(entry -> {
             int id = entry.getKey();
             ModdedBlock block = entry.getValue();
             String details = ModdedBlockData.toBlockData(block.getBlockType(), id).getAsString().split("\\[")[1].split("]")[0];
-            Key texture = block.getTexture();
+            Key textureKey = block.getTextureKey();
+            String blockName = block.getKey().value();
 
-            variants.put(details, MultiVariant.of(Variant.builder().model(texture).build()));
+            //If the namespace isn't minecraft, which means the item is displayed as a custom image, we have to create the image and import to the resource pack.
+            if (!textureKey.namespace().equals("minecraft")) {
+                //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
+                FileUtil.extractFile(
+                        block.getTextureResource(),
+                        new File("plugins/ModdedBukkit/assets/" + blockName + ".png")
+                );
+
+                Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + blockName + ".png")));
+
+                pack.texture(texture);
+            }
+
+            variants.put(details, MultiVariant.of(Variant.builder().model(textureKey).build()));
         });
 
         return BlockState.of(Key.key("minecraft:note_block"), variants);

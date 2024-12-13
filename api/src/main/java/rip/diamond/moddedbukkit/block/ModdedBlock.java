@@ -4,11 +4,15 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.block.data.BlockData;
 
+import java.io.InputStream;
+
 public interface ModdedBlock {
 
     Key getKey();
 
-    Key getTexture();
+    Key getTextureKey();
+
+    InputStream getTextureResource();
 
     int getId();
 
