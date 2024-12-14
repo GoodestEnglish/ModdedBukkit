@@ -8,7 +8,6 @@ import team.unnamed.creative.model.Model;
 import team.unnamed.creative.model.ModelTexture;
 import team.unnamed.creative.model.ModelTextures;
 
-import java.io.InputStream;
 import java.util.Map;
 
 public interface ModdedBlock extends ModdedTexture {
@@ -16,6 +15,8 @@ public interface ModdedBlock extends ModdedTexture {
     int getId();
 
     ModdedBlockType getBlockType();
+
+    double getHardness();
 
     Sound getPlaceSound();
 

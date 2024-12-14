@@ -9,9 +9,12 @@ import java.util.Map;
 
 public class ModdedItemModuleImpl implements ModdedItemModule {
 
+    private final ModdedBukkitPlugin plugin;
     private final Map<String, ModdedItem> items = new HashMap<>();
 
-    public ModdedItemModuleImpl() {
+    public ModdedItemModuleImpl(ModdedBukkitPlugin plugin) {
+        this.plugin = plugin;
+
         Bukkit.getPluginManager().registerEvents(new ModdedItemModuleListener(ModdedBukkitPlugin.INSTANCE, this), ModdedBukkitPlugin.INSTANCE);
     }
 

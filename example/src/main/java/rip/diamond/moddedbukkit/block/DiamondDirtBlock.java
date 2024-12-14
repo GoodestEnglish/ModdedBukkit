@@ -2,6 +2,8 @@ package rip.diamond.moddedbukkit.block;
 
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import rip.diamond.moddedbukkit.ExamplePlugin;
@@ -13,12 +15,12 @@ public class DiamondDirtBlock implements ModdedBlock {
     private final ModdedBlockHandler handler = new ModdedBlockHandler() {
         @Override
         public void onPlace(BlockPlaceEvent event) {
-            event.getPlayer().sendMessage("You placed " + getKey().toString() + " (" + getBukkitBlockData().getAsString() + ")");
+            event.getPlayer().sendMessage(Component.text("You placed " + getKey().toString()).color(NamedTextColor.GRAY));
         }
 
         @Override
         public void onBreak(BlockBreakEvent event) {
-            event.getPlayer().sendMessage("You broke " + getKey().toString() + " (" + getBukkitBlockData().getAsString() + ")");
+            event.getPlayer().sendMessage(Component.text("You broke " + getKey().toString()).color(NamedTextColor.GRAY));
         }
     };
 
@@ -45,6 +47,11 @@ public class DiamondDirtBlock implements ModdedBlock {
     @Override
     public ModdedBlockType getBlockType() {
         return ModdedBlockType.NOTE_BLOCK;
+    }
+
+    @Override
+    public double getHardness() {
+        return 1.0;
     }
 
     @Override

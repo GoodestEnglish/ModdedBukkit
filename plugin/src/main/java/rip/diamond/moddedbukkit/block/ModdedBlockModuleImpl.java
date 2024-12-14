@@ -1,5 +1,9 @@
 package rip.diamond.moddedbukkit.block;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
+import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRemoveEntityEffect;
 import net.kyori.adventure.sound.Sound;
 import org.apache.commons.lang3.Range;
 import org.bukkit.*;
@@ -7,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -20,10 +25,14 @@ import java.util.Map;
 
 public class ModdedBlockModuleImpl implements ModdedBlockModule {
 
+    private final ModdedBukkitPlugin plugin;
     private final Map<Integer, ModdedBlock> blocks = new HashMap<>();
 
-    public ModdedBlockModuleImpl() {
-        Bukkit.getPluginManager().registerEvents(new ModdedBlockModuleListener(this), ModdedBukkitPlugin.INSTANCE);
+    public ModdedBlockModuleImpl(ModdedBukkitPlugin plugin) {
+        this.plugin = plugin;
+
+        Bukkit.getPluginManager().registerEvents(new ModdedBlockModuleListener(this), plugin);
+        PacketEvents.getAPI().getEventManager().registerListener(new ModdedBlockModulePacketListener(plugin, this), PacketListenerPriority.NORMAL);
     }
 
     @Override
@@ -73,15 +82,14 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         return getBlock(block) != null;
     }
 
-    public void playerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace, ModdedBlock block) {
-        BlockData blockData = block.getBukkitBlockData();
-        Sound placeSound = block.getPlaceSound();
-        World world = player.getWorld();
+    public void playerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace, ModdedBlock moddedBlock) {
+        BlockData blockData = moddedBlock.getBukkitBlockData();
+        Sound placeSound = moddedBlock.getPlaceSound();
         Block toBeReplaced = clickedOn.isReplaceable() ? clickedOn : clickedOn.getRelative(blockFace);
         Location toBeReplacedCenterLocation = toBeReplaced.getLocation().toCenterLocation();
         BlockData oldBlockData = toBeReplaced.getBlockData();
 
-        //Do not allow placing if the block player clicked on is interactable and is not sneaking
+        //Do not allow placing if the moddedBlock player clicked on is interactable and is not sneaking
         if (BlockUtil.isInteractable(clickedOn) && !player.isSneaking()) {
             return;
         }
@@ -89,11 +97,11 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         if (!Range.between(toBeReplaced.getWorld().getMinHeight(), toBeReplaced.getWorld().getMaxHeight() - 1).contains(toBeReplaced.getY())) {
             return;
         }
-        //Do not allow placing if there's any entities standing near the block
+        //Do not allow placing if there's any entities standing near the moddedBlock
         if (toBeReplacedCenterLocation.getNearbyLivingEntities(0.5, 0.5, 0.5).stream().anyMatch(entity -> !(entity instanceof Player p && p.getGameMode() == GameMode.SPECTATOR))) {
             return;
         }
-        //Do not allow placing if there's a block in that location, but isn't replaceable (For example: lever, skull)
+        //Do not allow placing if there's a moddedBlock in that location, but isn't replaceable (For example: lever, skull)
         if (toBeReplaced.getType() != Material.AIR && !toBeReplaced.isReplaceable()) {
             return;
         }
@@ -104,19 +112,45 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         BlockPlaceEvent event = new BlockPlaceEvent(toBeReplaced, toBeReplaced.getState(), clickedOn, itemStack, player, true, slot);
         event.callEvent();
 
-        //If event is cancelled, we set back the block data to the old state, to prevent block changes
+        //If event is cancelled, we set back the moddedBlock data to the old state, to prevent moddedBlock changes
         if (event.isCancelled()) {
-            //Set back the block data to the old state
+            //Set back the moddedBlock data to the old state
             toBeReplaced.setBlockData(oldBlockData);
             return;
         }
 
-        //Start making player place the block
+        //Start making player place the moddedBlock
         if (player.getGameMode() != GameMode.CREATIVE) {
             itemStack.subtract();
         }
         player.swingHand(slot);
         SoundUtil.playSound(toBeReplacedCenterLocation, placeSound);
-        world.sendGameEvent(player, GameEvent.BLOCK_PLACE, toBeReplaced.getLocation().toVector());
+    }
+
+    public void playerBreakBlock(Player player, Block block) {
+        ModdedBlock moddedBlock = getBlock(block);
+
+        //If moddedBlock is null, it means the block isn't a custom block
+        if (moddedBlock == null) {
+            return;
+        }
+
+        BlockBreakEvent event = new BlockBreakEvent(block, player);
+        event.callEvent();
+
+        if (event.isCancelled()) {
+            return;
+        }
+
+        Sound placeSound = moddedBlock.getBreakSound();
+        Location blockCenterLocation = block.getLocation().toCenterLocation();
+        BlockData oldBlockData = block.getBlockData();
+
+        block.setType(Material.AIR);
+        SoundUtil.playSound(blockCenterLocation, placeSound);
+        blockCenterLocation.getWorld().spawnParticle(Particle.BLOCK, blockCenterLocation, 10, 0.5, 0.5, 0.5, 0, oldBlockData);
+
+        WrapperPlayServerRemoveEntityEffect removeEntityEffectPacket = new WrapperPlayServerRemoveEntityEffect(player.getEntityId(), PotionTypes.MINING_FATIGUE);
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, removeEntityEffectPacket);
     }
 }
