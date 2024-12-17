@@ -2,8 +2,6 @@ package rip.diamond.moddedbukkit.block;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
-import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRemoveEntityEffect;
 import net.kyori.adventure.sound.Sound;
 import org.apache.commons.lang3.Range;
 import org.bukkit.*;
@@ -11,7 +9,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -125,32 +122,5 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         }
         player.swingHand(slot);
         SoundUtil.playSound(toBeReplacedCenterLocation, placeSound);
-    }
-
-    public void playerBreakBlock(Player player, Block block) {
-        ModdedBlock moddedBlock = getBlock(block);
-
-        //If moddedBlock is null, it means the block isn't a custom block
-        if (moddedBlock == null) {
-            return;
-        }
-
-        BlockBreakEvent event = new BlockBreakEvent(block, player);
-        event.callEvent();
-
-        if (event.isCancelled()) {
-            return;
-        }
-
-        Sound placeSound = moddedBlock.getBreakSound();
-        Location blockCenterLocation = block.getLocation().toCenterLocation();
-        BlockData oldBlockData = block.getBlockData();
-
-        block.setType(Material.AIR);
-        SoundUtil.playSound(blockCenterLocation, placeSound);
-        blockCenterLocation.getWorld().spawnParticle(Particle.BLOCK, blockCenterLocation, 10, 0.5, 0.5, 0.5, 0, oldBlockData);
-
-        WrapperPlayServerRemoveEntityEffect removeEntityEffectPacket = new WrapperPlayServerRemoveEntityEffect(player.getEntityId(), PotionTypes.MINING_FATIGUE);
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, removeEntityEffectPacket);
     }
 }

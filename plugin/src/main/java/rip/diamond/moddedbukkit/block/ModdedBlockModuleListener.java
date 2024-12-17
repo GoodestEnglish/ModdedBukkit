@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import rip.diamond.moddedbukkit.util.NoteBlockSoundUtil;
 
 import java.util.Map;
@@ -56,12 +57,14 @@ public class ModdedBlockModuleListener implements Listener {
     public void onBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
         ModdedBlock moddedBlock = module.getBlock(block);
+        ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
 
         //If the block player is breaking is a custom block, we do the following:
         // - Disable default item drops, prevent player gain default note block and tripwire
         // - Run custom block handler
         if (moddedBlock != null) {
             event.setDropItems(false);
+            moddedBlock.getDrops(tool).forEach(itemStack -> block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), itemStack));
             moddedBlock.getHandler().onBreak(event);
         }
     }
@@ -76,6 +79,7 @@ public class ModdedBlockModuleListener implements Listener {
 
         //Custom Note Block
         if (material == Material.NOTE_BLOCK && action == Action.RIGHT_CLICK_BLOCK && ((NoteBlock) blockData).getInstrument() != Instrument.PIANO) {
+            //TODO: cancel the event makes player cannot place block
             event.setCancelled(true);
         }
         //Custom Tripwire Block

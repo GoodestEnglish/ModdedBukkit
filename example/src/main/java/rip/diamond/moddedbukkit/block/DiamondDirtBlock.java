@@ -6,14 +6,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 import rip.diamond.moddedbukkit.ExamplePlugin;
 import rip.diamond.moddedbukkit.item.DiamondDirtItem;
 
 import java.io.InputStream;
+import java.util.List;
 
-/* TODO List:
- * - Use NAMED_SOUND_EFFECT packet to do block hit sound
- */
 public class DiamondDirtBlock implements ModdedBlock {
 
     public static int ID = 0;
@@ -71,8 +70,10 @@ public class DiamondDirtBlock implements ModdedBlock {
     }
 
     @Override
-    public int getItemId() {
-        return DiamondDirtItem.ID;
+    public List<ItemStack> getDrops(ItemStack tool) {
+        return List.of(
+                ExamplePlugin.INSTANCE.getItemModule().getItem(DiamondDirtItem.KEY.asString()).buildItemStack()
+        );
     }
 
     @Override
