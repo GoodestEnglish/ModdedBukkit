@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import rip.diamond.moddedbukkit.ExamplePlugin;
+import rip.diamond.moddedbukkit.item.DiamondDirtItem;
 
 import java.io.InputStream;
 
@@ -14,6 +15,8 @@ import java.io.InputStream;
  * - Use NAMED_SOUND_EFFECT packet to do block hit sound
  */
 public class DiamondDirtBlock implements ModdedBlock {
+
+    public static int ID = 0;
 
     private final ModdedBlockHandler handler = new ModdedBlockHandler() {
         @Override
@@ -44,7 +47,7 @@ public class DiamondDirtBlock implements ModdedBlock {
 
     @Override
     public int getId() {
-        return 0;
+        return ID;
     }
 
     @Override
@@ -65,6 +68,11 @@ public class DiamondDirtBlock implements ModdedBlock {
     @Override
     public Sound getBreakSound() {
         return Sound.sound(org.bukkit.Sound.BLOCK_GRASS_BREAK, Sound.Source.MASTER, 1f, 1f);
+    }
+
+    @Override
+    public int getItemId() {
+        return DiamondDirtItem.ID;
     }
 
     @Override

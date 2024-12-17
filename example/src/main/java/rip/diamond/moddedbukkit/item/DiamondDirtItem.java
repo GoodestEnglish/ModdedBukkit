@@ -8,6 +8,7 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 import rip.diamond.moddedbukkit.ExamplePlugin;
+import rip.diamond.moddedbukkit.block.DiamondDirtBlock;
 
 import java.io.InputStream;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class DiamondDirtItem implements ModdedPlaceableItem {
 
     public static Key KEY = Key.key("example:diamond_dirt");
+    public static int ID = 1;
 
     @Override
     public Key getKey() {
@@ -33,7 +35,7 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
 
     @Override
     public @Range(from = 1, to = Integer.MAX_VALUE) int getId() {
-        return 1;
+        return ID;
     }
 
     @Override
@@ -50,6 +52,6 @@ public class DiamondDirtItem implements ModdedPlaceableItem {
 
     @Override
     public int getBlockId() {
-        return 0;
+        return DiamondDirtBlock.ID;
     }
 }

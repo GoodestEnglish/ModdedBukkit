@@ -22,6 +22,8 @@ public interface ModdedBlock extends ModdedTexture {
 
     Sound getBreakSound();
 
+    int getItemId();
+
     ModdedBlockHandler getHandler();
 
     /**
