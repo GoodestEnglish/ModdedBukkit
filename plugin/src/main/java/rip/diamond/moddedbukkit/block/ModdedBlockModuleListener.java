@@ -1,7 +1,6 @@
 package rip.diamond.moddedbukkit.block;
 
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Instrument;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,13 +38,16 @@ public class ModdedBlockModuleListener implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         Block block = event.getBlock();
-        ModdedBlock moddedBlock = module.getBlock(block);
+        ItemStack item = event.getItemInHand();
 
-        //When placing a note block, the block data (specificity, instrument type) will change according to the block underneath.
-        //By set a new note block BlockData when placing note block can force the note block instrument type to be PIANO only.
-        if (block.getType() == Material.NOTE_BLOCK && moddedBlock == null) {
-            block.setBlockData(Bukkit.createBlockData(Material.NOTE_BLOCK));
+        //If the item in hand is a note block, then place it without applying the physics
+        //This is to prevent block physics update (specificity, block data like instrument type) when note block is placed, causing note block instrument change.
+        if (item.getType() == Material.NOTE_BLOCK) {
+            block.setType(Material.NOTE_BLOCK, false);
+            return;
         }
+
+        ModdedBlock moddedBlock = module.getBlock(block);
 
         //If the block player is placing is a custom block, run custom block handler
         if (moddedBlock != null) {
