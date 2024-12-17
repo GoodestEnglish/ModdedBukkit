@@ -3,24 +3,24 @@ package rip.diamond.moddedbukkit.block;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListener;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.protocol.player.DiggingAction;
 import com.github.retrooper.packetevents.protocol.player.InteractionHand;
-import com.github.retrooper.packetevents.protocol.potion.PotionTypes;
 import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientAnimation;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPlayerDigging;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockBreakAnimation;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityEffect;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerRemoveEntityEffect;
+import com.github.retrooper.packetevents.wrapper.play.server.*;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -53,7 +53,6 @@ public class ModdedBlockModulePacketListener implements PacketListener {
                 return;
             }
 
-            //TODO: Possible to change the hardness of the note block to unbreakable? So that I don't have to use this hacky entity effect packet to simulate block is unbreakable
             switch (action) {
                 case START_DIGGING -> {
                     //Setup block metadata
@@ -64,18 +63,21 @@ public class ModdedBlockModulePacketListener implements PacketListener {
                     Map<UUID, BreakStatus> map = getBlockBreakStatus(block);
                     map.put(player.getUniqueId(), new BreakStatus());
 
-                    WrapperPlayServerEntityEffect entityEffectPacket = new WrapperPlayServerEntityEffect(player.getEntityId(), PotionTypes.MINING_FATIGUE, Integer.MAX_VALUE, Integer.MAX_VALUE, (byte) 0);
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(player, entityEffectPacket);
+                    WrapperPlayServerUpdateAttributes updateAttributesPacket = new WrapperPlayServerUpdateAttributes(player.getEntityId(), List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.BLOCK_BREAK_SPEED, 0, List.of())));
+                    PacketEvents.getAPI().getPlayerManager().sendPacket(player, updateAttributesPacket);
                 }
                 case CANCELLED_DIGGING, FINISHED_DIGGING -> {
-                    Map<UUID, BreakStatus> map = getBlockBreakStatus(block);
-                    map.remove(player.getUniqueId());
-
-                    WrapperPlayServerRemoveEntityEffect removeEntityEffectPacket = new WrapperPlayServerRemoveEntityEffect(player.getEntityId(), PotionTypes.MINING_FATIGUE);
-                    PacketEvents.getAPI().getPlayerManager().sendPacket(player, removeEntityEffectPacket);
+                    cancelDigging(player, block);
                 }
             }
-        } else if (event.getPacketType() == PacketType.Play.Client.ANIMATION) {
+        }
+        //TODO: Replace this to a bukkit runnable and place it into the hashmap
+        else if (event.getPacketType() == PacketType.Play.Client.ANIMATION) {
+            //Ignore player in creative mode because player in creative mode can break block instantly
+            if (player.getGameMode() == GameMode.CREATIVE) {
+                return;
+            }
+
             WrapperPlayClientAnimation packet = new WrapperPlayClientAnimation(event);
             InteractionHand hand = packet.getHand();
 
@@ -110,6 +112,8 @@ public class ModdedBlockModulePacketListener implements PacketListener {
             if (stage > 9) {
                 Bukkit.getServer().getScheduler().runTask(plugin, () -> {
                     module.playerBreakBlock(player, block);
+
+                    cancelDigging(player, block);
                 });
             } else {
                 //Simulate the block break status by sending a break animation packet to the player
@@ -122,6 +126,14 @@ public class ModdedBlockModulePacketListener implements PacketListener {
     @SuppressWarnings("unchecked")
     private Map<UUID, BreakStatus> getBlockBreakStatus(Block block) {
         return (Map<UUID, BreakStatus>) block.getMetadata(BLOCK_METADATA).getFirst().value();
+    }
+
+    private void cancelDigging(Player player, Block block) {
+        Map<UUID, BreakStatus> map = getBlockBreakStatus(block);
+        map.remove(player.getUniqueId());
+
+        WrapperPlayServerUpdateAttributes updateAttributesPacket = new WrapperPlayServerUpdateAttributes(player.getEntityId(), List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.BLOCK_BREAK_SPEED, player.getAttribute(Attribute.PLAYER_BLOCK_BREAK_SPEED).getValue(), List.of())));
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, updateAttributesPacket);
     }
 
     private static class BreakStatus {

@@ -10,6 +10,9 @@ import rip.diamond.moddedbukkit.ExamplePlugin;
 
 import java.io.InputStream;
 
+/* TODO List:
+ * - Use NAMED_SOUND_EFFECT packet to do block hit sound
+ */
 public class DiamondDirtBlock implements ModdedBlock {
 
     private final ModdedBlockHandler handler = new ModdedBlockHandler() {
@@ -51,7 +54,7 @@ public class DiamondDirtBlock implements ModdedBlock {
 
     @Override
     public double getHardness() {
-        return 1.0;
+        return 10.0;
     }
 
     @Override

@@ -6,7 +6,7 @@ ModdedBukkit currently only support [PaperMC](https://papermc.io/), with limited
 ## Why ModdedBukkit?
 ModdedBukkit is the best open-source framework with several reasons:
 
-- Performance - This is our top priority! Only register modules you need.
+- Performance - This is our top priority! We try to simplify the creation of a custom object with minimal to nearly zero performance impact.
 - Readability - The API has a well-documented Javadoc. It is easy to understand the logic behind.
 - Documentation - We have a detailed documentation for developers who are willing to use this framework.
 
