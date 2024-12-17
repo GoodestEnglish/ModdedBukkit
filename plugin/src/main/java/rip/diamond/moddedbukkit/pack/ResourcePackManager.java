@@ -1,29 +1,13 @@
 package rip.diamond.moddedbukkit.pack;
 
-import net.kyori.adventure.key.Key;
 import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
-import rip.diamond.moddedbukkit.block.ModdedBlock;
-import rip.diamond.moddedbukkit.block.ModdedBlockData;
-import rip.diamond.moddedbukkit.block.ModdedBlockModuleImpl;
-import rip.diamond.moddedbukkit.block.ModdedBlockType;
-import rip.diamond.moddedbukkit.item.ModdedItem;
-import rip.diamond.moddedbukkit.item.ModdedItemModuleImpl;
-import rip.diamond.moddedbukkit.util.FileUtil;
+import rip.diamond.moddedbukkit.pack.modifier.implement.ResourcePackNoteBlockBlockStateModifier;
+import rip.diamond.moddedbukkit.pack.modifier.implement.ResourcePackPaperModelModifier;
+import rip.diamond.moddedbukkit.pack.modifier.implement.ResourcePackSoundRegistryModifier;
 import team.unnamed.creative.ResourcePack;
-import team.unnamed.creative.base.Writable;
-import team.unnamed.creative.blockstate.BlockState;
-import team.unnamed.creative.blockstate.MultiVariant;
-import team.unnamed.creative.blockstate.Variant;
 import team.unnamed.creative.central.CreativeCentral;
 import team.unnamed.creative.central.CreativeCentralProvider;
 import team.unnamed.creative.central.event.pack.ResourcePackGenerateEvent;
-import team.unnamed.creative.model.*;
-import team.unnamed.creative.texture.Texture;
-
-import java.io.File;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ResourcePackManager {
 
@@ -40,76 +24,13 @@ public class ResourcePackManager {
     private void listenToEvent() {
         central.eventBus().listen(plugin, ResourcePackGenerateEvent.class, event -> {
             ResourcePack pack = event.resourcePack();
-            BlockState blockState = buildNoteBlockBlockState(pack);
-            Model paperModel = buildPaperModel(pack);
+
+            new ResourcePackPaperModelModifier(plugin, pack).modify();
+            new ResourcePackNoteBlockBlockStateModifier(plugin, pack).modify();
+            new ResourcePackSoundRegistryModifier(plugin, pack).modify();
 
             pack.packMeta(9, "ModdedBukkit Generated ResourcePack");
-            pack.blockState(blockState);
-            pack.model(paperModel);
         });
-    }
-
-    private BlockState buildNoteBlockBlockState(ResourcePack pack) {
-        Map<String, MultiVariant> variants = new HashMap<>();
-
-        plugin.getModule(ModdedBlockModuleImpl.class).getBlocks().entrySet().stream().filter(entry -> entry.getValue().getBlockType() == ModdedBlockType.NOTE_BLOCK).sorted(Comparator.comparingInt(Map.Entry::getKey)).forEachOrdered(entry -> {
-            int id = entry.getKey();
-            ModdedBlock block = entry.getValue();
-            String details = ModdedBlockData.toBlockData(block.getBlockType(), id).getAsString().split("\\[")[1].split("]")[0];
-            Key textureKey = block.getTextureKey();
-
-            //If the namespace isn't minecraft, which means the item is displayed as a custom image, we have to create the image and import to the resource pack.
-            if (!textureKey.namespace().equals("minecraft")) {
-                insertTextureAndModel(pack, block);
-            }
-
-            variants.put(details, MultiVariant.of(Variant.builder().model(textureKey).build()));
-        });
-
-        return BlockState.of(Key.key("minecraft:note_block"), variants);
-    }
-
-    private Model buildPaperModel(ResourcePack pack) {
-        Model.Builder paperModel = Model.model()
-                .key(Key.key("minecraft:item/paper"))
-                .parent(Key.key("minecraft:item/generated"))
-                .textures(ModelTextures.builder()
-                        .layers(
-                                ModelTexture.ofKey(Key.key("minecraft:item/paper"))
-                        )
-                        .build()
-                );
-
-        plugin.getModule(ModdedItemModuleImpl.class).getItems().entrySet().stream().sorted(Comparator.comparingInt(entry -> entry.getValue().getId())).forEachOrdered(entry -> {
-            ModdedItem item = entry.getValue();
-            Key textureKey = item.getTextureKey();
-
-            //If the namespace isn't minecraft, which means the item is displayed as a custom image, we have to create the image and import to the resource pack.
-            if (!textureKey.namespace().equals("minecraft")) {
-                insertTextureAndModel(pack, item);
-            }
-
-            paperModel.addOverride(ItemOverride.of(textureKey, ItemPredicate.customModelData(item.getId())));
-        });
-
-        return paperModel.build();
-    }
-
-    private void insertTextureAndModel(ResourcePack pack, ModdedTexture moddedTexture) {
-        String name = moddedTexture.getKey().value();
-        Key textureKey = moddedTexture.getTextureKey();
-
-        //Extract the png file from plugin resource, and paste it to the ModdedBukkit plugin folder
-        FileUtil.extractFile(
-                moddedTexture.getTextureResource(),
-                new File("plugins/ModdedBukkit/assets/" + name + ".png")
-        );
-
-        Texture texture = Texture.texture(Key.key(textureKey.asString() + ".png"), Writable.file(new File("plugins/ModdedBukkit/assets/" + name + ".png")));
-        Model model = moddedTexture.createModel();
-
-        pack.texture(texture);
-        pack.model(model);
     }
 
 }

@@ -23,13 +23,14 @@ public class ModdedBukkitPlugin extends JavaPlugin implements ModdedBukkit {
 
     @Override
     public void onLoad() {
+        INSTANCE = this;
+
         PacketEvents.setAPI(SpigotPacketEventsBuilder.build(ModdedBukkitPlugin.INSTANCE));
         PacketEvents.getAPI().load();
     }
 
     @Override
     public void onEnable() {
-        INSTANCE = this;
         resourcePackManager = new ResourcePackManager(this);
 
         PacketEvents.getAPI().init();
