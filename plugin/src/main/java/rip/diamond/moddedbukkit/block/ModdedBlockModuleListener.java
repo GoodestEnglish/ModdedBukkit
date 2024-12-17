@@ -1,19 +1,23 @@
 package rip.diamond.moddedbukkit.block;
 
 import lombok.RequiredArgsConstructor;
+import org.bukkit.GameMode;
 import org.bukkit.Instrument;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.NoteBlock;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import rip.diamond.moddedbukkit.util.NoteBlockSoundUtil;
 
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -57,6 +61,7 @@ public class ModdedBlockModuleListener implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
         Block block = event.getBlock();
         ModdedBlock moddedBlock = module.getBlock(block);
         ItemStack tool = event.getPlayer().getInventory().getItemInMainHand();
@@ -66,8 +71,11 @@ public class ModdedBlockModuleListener implements Listener {
         // - Run custom block handler
         if (moddedBlock != null) {
             event.setDropItems(false);
-            moddedBlock.getDrops(tool).forEach(itemStack -> block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), itemStack));
             moddedBlock.getHandler().onBreak(event);
+
+            if (!event.isCancelled() && player.getGameMode() != GameMode.CREATIVE) {
+                moddedBlock.getDrops(tool).forEach(itemStack -> block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), itemStack));
+            }
         }
     }
 
@@ -103,5 +111,19 @@ public class ModdedBlockModuleListener implements Listener {
 
             event.setInstrument(fakeInstrument);
         }
+    }
+
+    @EventHandler
+    public void onExplode(BlockExplodeEvent event) {
+        List<Block> blocks = event.blockList();
+
+        module.simulateExplodeBlockDrop(blocks);
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent event) {
+        List<Block> blocks = event.blockList();
+
+        module.simulateExplodeBlockDrop(blocks);
     }
 }

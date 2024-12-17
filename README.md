@@ -13,6 +13,10 @@ ModdedBukkit is the best open-source framework with several reasons:
 ## Getting Started
 To get started, head over to our documentation page.
 
+## To-Do
+
+- String Custom Block support
+
 ## Credit
 
 - Nexo - Inspiration and some utility classes (Previously Oraxen)

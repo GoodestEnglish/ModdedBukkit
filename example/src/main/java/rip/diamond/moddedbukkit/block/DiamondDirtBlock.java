@@ -7,6 +7,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import rip.diamond.moddedbukkit.ExamplePlugin;
 import rip.diamond.moddedbukkit.item.DiamondDirtItem;
 
@@ -70,7 +71,7 @@ public class DiamondDirtBlock implements ModdedBlock {
     }
 
     @Override
-    public List<ItemStack> getDrops(ItemStack tool) {
+    public List<ItemStack> getDrops(@Nullable ItemStack tool) {
         return List.of(
                 ExamplePlugin.INSTANCE.getItemModule().getItem(DiamondDirtItem.KEY.asString()).buildItemStack()
         );

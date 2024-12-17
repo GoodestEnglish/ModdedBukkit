@@ -54,7 +54,7 @@ public class ModdedItemModuleListener implements Listener {
 
             Preconditions.checkNotNull(block);
 
-            blockModule.playerPlaceBlock(player, slot, itemStack, block, blockFace, moddedBlock);
+            blockModule.simulatePlayerPlaceBlock(player, slot, itemStack, block, blockFace, moddedBlock);
         }
     }
 

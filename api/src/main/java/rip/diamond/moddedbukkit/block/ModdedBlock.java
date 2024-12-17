@@ -4,6 +4,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import rip.diamond.moddedbukkit.pack.ModdedTexture;
 import team.unnamed.creative.model.Model;
 import team.unnamed.creative.model.ModelTexture;
@@ -24,7 +25,7 @@ public interface ModdedBlock extends ModdedTexture {
 
     Sound getBreakSound();
 
-    List<ItemStack> getDrops(ItemStack tool);
+    List<ItemStack> getDrops(@Nullable ItemStack tool);
 
     ModdedBlockHandler getHandler();
 

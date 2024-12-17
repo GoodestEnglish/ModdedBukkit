@@ -17,8 +17,7 @@ import rip.diamond.moddedbukkit.util.BlockUtil;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
 import rip.diamond.moddedbukkit.util.SoundUtil;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ModdedBlockModuleImpl implements ModdedBlockModule {
 
@@ -79,7 +78,7 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         return getBlock(block) != null;
     }
 
-    public void playerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace, ModdedBlock moddedBlock) {
+    public void simulatePlayerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace, ModdedBlock moddedBlock) {
         BlockData blockData = moddedBlock.getBukkitBlockData();
         Sound placeSound = moddedBlock.getPlaceSound();
         Block toBeReplaced = clickedOn.isReplaceable() ? clickedOn : clickedOn.getRelative(blockFace);
@@ -122,5 +121,22 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         }
         player.swingHand(slot);
         SoundUtil.playSound(toBeReplacedCenterLocation, placeSound);
+    }
+
+    public void simulateExplodeBlockDrop(List<Block> blocks) {
+        Iterator<Block> iterator = blocks.iterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            ModdedBlock moddedBlock = getBlock(block);
+
+            if (moddedBlock == null) {
+                continue;
+            }
+
+            moddedBlock.getDrops(null).forEach(itemStack -> block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), itemStack));
+            block.setType(Material.AIR);
+            iterator.remove();
+        }
     }
 }
