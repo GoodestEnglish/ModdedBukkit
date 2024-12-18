@@ -140,7 +140,15 @@ public class ModdedBlockModuleListener implements Listener {
         if (instrument != Instrument.PIANO) {
             event.setCancelled(true);
         } else {
-            String blockType = event.getBlock().getRelative(BlockFace.DOWN).getType().name().toLowerCase();
+            Block underBlock = event.getBlock().getRelative(BlockFace.DOWN);
+            ModdedBlock underModdedBlock = module.getBlock(underBlock);
+
+            //If the block is a custom block, we don't change the instrument
+            if (underModdedBlock != null) {
+                return;
+            }
+
+            String blockType = underBlock.getType().name().toLowerCase();
             Instrument fakeInstrument = NoteBlockSoundUtil.BLOCK.entrySet().stream().filter(entry -> entry.getValue().contains(blockType)).map(Map.Entry::getKey).findFirst().orElse(Instrument.PIANO);
 
             event.setInstrument(fakeInstrument);

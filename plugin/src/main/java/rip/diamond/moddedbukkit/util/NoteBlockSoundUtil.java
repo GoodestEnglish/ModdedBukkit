@@ -13,12 +13,11 @@ public class NoteBlockSoundUtil {
 
     static {
         //Credit: Instrument list from Oraxen
-        //TODO: Note block place under note block, sound is different compare to vanilla
         BLOCK = Map.ofEntries(
                 Map.entry(Instrument.BASS_DRUM, List.of("stone", "netherrack", "bedrock", "observer", "coral", "obsidian", "anchor", "quartz")),
                 Map.entry(Instrument.SNARE_DRUM, List.of("sand", "gravel", "concrete_powder", "soul_soil")),
                 Map.entry(Instrument.STICKS, List.of("glass", "sea_lantern", "beacon")),
-                Map.entry(Instrument.BASS_GUITAR, List.of("wood")),
+                Map.entry(Instrument.BASS_GUITAR, List.of("wood", "note_block")),
                 Map.entry(Instrument.FLUTE, List.of("clay")),
                 Map.entry(Instrument.BELL, List.of("gold_block")),
                 Map.entry(Instrument.GUITAR, List.of("wool")),
