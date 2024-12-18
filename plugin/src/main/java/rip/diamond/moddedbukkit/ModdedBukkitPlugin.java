@@ -1,13 +1,11 @@
 package rip.diamond.moddedbukkit;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.plugin.java.JavaPlugin;
 import rip.diamond.moddedbukkit.pack.ResourcePackManager;
-import rip.diamond.moddedbukkit.block.ModdedBlockModulePacketListener;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
 
 import java.util.HashMap;

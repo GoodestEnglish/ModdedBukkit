@@ -62,12 +62,27 @@ public class DiamondDirtBlock implements ModdedBlock {
 
     @Override
     public Sound getPlaceSound() {
-        return Sound.sound(org.bukkit.Sound.BLOCK_GRASS_PLACE, Sound.Source.MASTER, 1f, 1f);
+        return Sound.sound(org.bukkit.Sound.BLOCK_ROOTED_DIRT_PLACE, Sound.Source.MASTER, 1.0f, 0.8f);
     }
 
     @Override
     public Sound getBreakSound() {
-        return Sound.sound(org.bukkit.Sound.BLOCK_GRASS_BREAK, Sound.Source.MASTER, 1f, 1f);
+        return Sound.sound(org.bukkit.Sound.BLOCK_ROOTED_DIRT_BREAK, Sound.Source.MASTER, 1.0f, 0.8f);
+    }
+
+    @Override
+    public Sound getHitSound() {
+        return Sound.sound(org.bukkit.Sound.BLOCK_ROOTED_DIRT_HIT, Sound.Source.MASTER, 0.25f, 0.5f);
+    }
+
+    @Override
+    public Sound getStepSound() {
+        return Sound.sound(org.bukkit.Sound.BLOCK_ROOTED_DIRT_STEP, Sound.Source.MASTER, 0.15f, 1.0f);
+    }
+
+    @Override
+    public Sound getFallSound() {
+        return Sound.sound(org.bukkit.Sound.BLOCK_ROOTED_DIRT_FALL, Sound.Source.MASTER, 0.5f, 0.75f);
     }
 
     @Override

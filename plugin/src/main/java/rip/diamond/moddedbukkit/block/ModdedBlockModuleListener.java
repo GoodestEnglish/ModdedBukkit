@@ -1,9 +1,13 @@
 package rip.diamond.moddedbukkit.block;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.attribute.Attributes;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.GameMode;
 import org.bukkit.Instrument;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -96,6 +100,36 @@ public class ModdedBlockModuleListener implements Listener {
         else if (material == Material.TRIPWIRE && action == Action.PHYSICAL) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onDamage(BlockDamageEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+        ModdedBlock moddedBlock = module.getBlock(block);
+
+        if (moddedBlock == null) {
+            return;
+        }
+
+        double speed = 1 / moddedBlock.getHardness();
+
+        WrapperPlayServerUpdateAttributes updateAttributesPacket = new WrapperPlayServerUpdateAttributes(player.getEntityId(), List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.BLOCK_BREAK_SPEED, speed, List.of())));
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, updateAttributesPacket);
+    }
+
+    @EventHandler
+    public void onDamageAbort(BlockDamageAbortEvent event) {
+        Player player = event.getPlayer();
+        Block block = event.getBlock();
+        ModdedBlock moddedBlock = module.getBlock(block);
+
+        if (moddedBlock == null) {
+            return;
+        }
+
+        WrapperPlayServerUpdateAttributes updateAttributesPacket = new WrapperPlayServerUpdateAttributes(player.getEntityId(), List.of(new WrapperPlayServerUpdateAttributes.Property(Attributes.BLOCK_BREAK_SPEED, player.getAttribute(Attribute.PLAYER_BLOCK_BREAK_SPEED).getValue(), List.of())));
+        PacketEvents.getAPI().getPlayerManager().sendPacket(player, updateAttributesPacket);
     }
 
     //Play default note block sound according to the block under

@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
 import rip.diamond.moddedbukkit.util.BlockUtil;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
-import rip.diamond.moddedbukkit.util.SoundUtil;
 
 import java.util.*;
 
@@ -28,7 +27,7 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         this.plugin = plugin;
 
         Bukkit.getPluginManager().registerEvents(new ModdedBlockModuleListener(this), plugin);
-        PacketEvents.getAPI().getEventManager().registerListener(new ModdedBlockModulePacketListener(plugin, this), PacketListenerPriority.NORMAL);
+        Bukkit.getPluginManager().registerEvents(new ModdedBlockModuleSoundListener(plugin, this), plugin);
     }
 
     @Override
@@ -120,7 +119,6 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
             itemStack.subtract();
         }
         player.swingHand(slot);
-        SoundUtil.playSound(toBeReplacedCenterLocation, placeSound);
     }
 
     public void simulateExplodeBlockDrop(List<Block> blocks) {

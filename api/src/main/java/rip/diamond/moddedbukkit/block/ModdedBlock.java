@@ -25,6 +25,12 @@ public interface ModdedBlock extends ModdedTexture {
 
     Sound getBreakSound();
 
+    Sound getHitSound();
+
+    Sound getStepSound();
+
+    Sound getFallSound();
+
     List<ItemStack> getDrops(@Nullable ItemStack tool);
 
     ModdedBlockHandler getHandler();
