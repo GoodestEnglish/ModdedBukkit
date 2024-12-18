@@ -1,13 +1,9 @@
 package rip.diamond.moddedbukkit.block;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.attribute.Attributes;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerUpdateAttributes;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -25,10 +21,6 @@ import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
 import rip.diamond.moddedbukkit.util.BlockUtil;
 import rip.diamond.moddedbukkit.util.SoundUtil;
 
-import javax.swing.plaf.SplitPaneUI;
-import java.util.Iterator;
-import java.util.List;
-
 /**
  * This class handles all block sounds.
  * <p>
@@ -44,9 +36,12 @@ public class ModdedBlockModuleSoundListener implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
+        Player player = event.getPlayer();
         Block block = event.getBlock();
         ModdedBlock moddedBlock = module.getBlock(block);
         Location centerLocation = block.getLocation().toCenterLocation();
+
+        stopBlockBreakSoundTask(player);
 
         if (moddedBlock != null) {
             SoundUtil.playSound(centerLocation, moddedBlock.getBreakSound());
@@ -157,6 +152,10 @@ public class ModdedBlockModuleSoundListener implements Listener {
     public void onDamageAbort(BlockDamageAbortEvent event) {
         Player player = event.getPlayer();
 
+        stopBlockBreakSoundTask(player);
+    }
+
+    private void stopBlockBreakSoundTask(Player player) {
         for (MetadataValue value : player.getMetadata(BLOCK_BREAK_SOUND_TASK)) {
             if (value.value() instanceof ModdedBlockModuleBlockBreakingSoundTask task) {
                 task.cancel();
