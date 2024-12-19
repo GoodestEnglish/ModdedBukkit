@@ -8,8 +8,18 @@ import org.bukkit.Note;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.NoteBlock;
 
+/**
+ * Interface for creating block data and retrieve block data.
+ */
 public interface ModdedBlockData {
 
+    /**
+     * Converts a custom block type and ID to Bukkit BlockData.
+     *
+     * @param type The modded block type
+     * @param id The block ID
+     * @return The corresponding BlockData
+     */
     static BlockData toBlockData(ModdedBlockType type, int id) {
         switch (type) {
             case NOTE_BLOCK -> {return NoteBlockData.toBlockData(id);}
@@ -19,7 +29,8 @@ public interface ModdedBlockData {
     }
 
     /**
-     * All custom block ID should be positive, including 0.
+     * Converts Bukkit BlockData to a custom block ID.
+     * All custom block IDs should be positive, including 0.
      *
      * @param data The block data
      * @return The block ID
@@ -34,8 +45,17 @@ public interface ModdedBlockData {
         }
     }
 
+    /**
+     * Interface representing NoteBlock data.
+     */
     interface NoteBlockData extends ModdedBlockData {
 
+        /**
+         * Converts a custom block ID to NoteBlock BlockData.
+         *
+         * @param id The block ID
+         * @return The corresponding NoteBlock BlockData
+         */
         static BlockData toBlockData(int id) {
             // Skip all BlockData with PIANO Instrument, 0 - 24 reserved for PIANO all notes but not powered
             id += 25;
@@ -54,6 +74,12 @@ public interface ModdedBlockData {
             return noteBlock;
         }
 
+        /**
+         * Converts NoteBlock BlockData to a custom block ID.
+         *
+         * @param data The NoteBlock BlockData
+         * @return The block ID
+         */
         static int fromBlockData(BlockData data) {
             NoteBlock noteBlock = (NoteBlock) data;
 
@@ -73,12 +99,26 @@ public interface ModdedBlockData {
         }
     }
 
-
+    /**
+     * Interface representing Tripwire data.
+     */
     interface TripwireData extends ModdedBlockData {
+        /**
+         * Converts a custom block ID to Tripwire BlockData.
+         *
+         * @param id The block ID
+         * @return The corresponding Tripwire BlockData
+         */
         static BlockData toBlockData(int id) {
             throw new UnsupportedOperationException("Not yet implemented");
         }
 
+        /**
+         * Converts Tripwire BlockData to a custom block ID.
+         *
+         * @param data The Tripwire BlockData
+         * @return The block ID
+         */
         static int fromBlockData(BlockData data) {
             throw new UnsupportedOperationException("Not yet implemented");
         }

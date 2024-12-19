@@ -16,12 +16,15 @@ import team.unnamed.creative.model.ModelTextures;
 import javax.annotation.Nullable;
 import java.util.List;
 
+/**
+ * Interface representing a custom item.
+ */
 public interface ModdedItem extends ModdedTexture {
 
     NamespacedKey KEY = new NamespacedKey("moddedbukkit", "key");
 
     /**
-     * Get the ID of this ModdedItem.
+     * Gets the ID of this custom item.
      * <p>
      * ID is mostly used in creating paper's custom model data.
      *
@@ -29,10 +32,25 @@ public interface ModdedItem extends ModdedTexture {
      */
     @Range(from = 1, to = Integer.MAX_VALUE) int getId();
 
+    /**
+     * Gets the name of this custom item.
+     *
+     * @return The name as a Component
+     */
     Component getName();
 
+    /**
+     * Gets the lore of this custom item.
+     *
+     * @return The lore as a list of Components, or null if there is no lore
+     */
     @Nullable List<Component> getLore();
 
+    /**
+     * Builds an ItemStack representation of this custom item.
+     *
+     * @return The ItemStack
+     */
     default ItemStack buildItemStack() {
         ItemStack itemStack = ItemStack.of(Material.PAPER);
         ItemMeta meta = itemStack.getItemMeta();
@@ -47,6 +65,12 @@ public interface ModdedItem extends ModdedTexture {
         return itemStack;
     }
 
+    /**
+     * Creates the model representation of this ModdedItem.
+     * This is used to generate the model for the resource pack.
+     *
+     * @return The model
+     */
     @Override
     default Model createModel() {
         Key textureKey = getTextureKey();

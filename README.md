@@ -24,3 +24,4 @@ To get started, head over to our documentation page.
 - Nexo - Inspiration and some utility classes (Previously Oraxen)
 - [Creative](https://github.com/unnamed/creative) - Resource Pack generator
 - [PacketEvents](https://github.com/retrooper/packetevents) - Packets handling
+- [Github Copilot](https://copilot.github.com/) - JavaDoc
