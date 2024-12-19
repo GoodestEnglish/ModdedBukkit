@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import rip.diamond.moddedbukkit.ModdedBukkitPlugin;
 import rip.diamond.moddedbukkit.util.BlockUtil;
 import rip.diamond.moddedbukkit.util.ModdedLogger;
+import rip.diamond.moddedbukkit.util.SoundUtil;
 
 import java.util.*;
 
@@ -77,9 +78,19 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         return getBlock(block) != null;
     }
 
+    public void simulatePlayerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace) {
+        BlockData blockData = itemStack.getType().createBlockData();
+
+        simulatePlayerPlaceBlock(player, slot, itemStack, clickedOn, blockFace, blockData);
+    }
+
     public void simulatePlayerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace, ModdedBlock moddedBlock) {
         BlockData blockData = moddedBlock.getBukkitBlockData();
-        Sound placeSound = moddedBlock.getPlaceSound();
+
+        simulatePlayerPlaceBlock(player, slot, itemStack, clickedOn, blockFace, blockData);
+    }
+
+    public void simulatePlayerPlaceBlock(Player player, EquipmentSlot slot, ItemStack itemStack, Block clickedOn, BlockFace blockFace, BlockData blockData) {
         Block toBeReplaced = clickedOn.isReplaceable() ? clickedOn : clickedOn.getRelative(blockFace);
         Location toBeReplacedCenterLocation = toBeReplaced.getLocation().toCenterLocation();
         BlockData oldBlockData = toBeReplaced.getBlockData();
@@ -107,17 +118,24 @@ public class ModdedBlockModuleImpl implements ModdedBlockModule {
         BlockPlaceEvent event = new BlockPlaceEvent(toBeReplaced, toBeReplaced.getState(), clickedOn, itemStack, player, true, slot);
         event.callEvent();
 
-        //If event is cancelled, we set back the moddedBlock data to the old state, to prevent moddedBlock changes
+        //If event is cancelled, we set back the block data to the old state, to prevent moddedBlock changes
         if (event.isCancelled()) {
             //Set back the moddedBlock data to the old state
             toBeReplaced.setBlockData(oldBlockData);
             return;
         }
 
-        //Start making player place the moddedBlock
+        //Start making player place the block
         if (player.getGameMode() != GameMode.CREATIVE) {
             itemStack.subtract();
         }
+
+        //If the block player is placing is not a custom block, play the block place sound
+        //If the block is a custom block, the block place sound will be handled inside ModdedBlockModuleSoundListener#onPlace(BlockPlaceEvent)
+        if (!isCustomBlock(toBeReplaced)) {
+            SoundUtil.playSound(toBeReplacedCenterLocation, toBeReplaced.getBlockSoundGroup().getPlaceSound().getKey(), 1.0f, 0.8f);
+        }
+
         player.swingHand(slot);
     }
 

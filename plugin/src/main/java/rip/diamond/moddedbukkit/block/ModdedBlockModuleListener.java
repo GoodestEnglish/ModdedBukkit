@@ -83,21 +83,27 @@ public class ModdedBlockModuleListener implements Listener {
         }
     }
 
-    //Disable custom block action
+    //Disable custom block action, and allow block placing near custom note block
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
         Block block = event.getClickedBlock();
-        Material material = block == null ? null : block.getType();
+        Material blockMaterial = block == null ? null : block.getType();
         Action action = event.getAction();
         BlockData blockData = block == null ? null : block.getBlockData();
+        BlockFace blockFace = event.getBlockFace();
+        ItemStack item = event.getItem();
 
         //Custom Note Block
-        if (material == Material.NOTE_BLOCK && action == Action.RIGHT_CLICK_BLOCK && ((NoteBlock) blockData).getInstrument() != Instrument.PIANO) {
-            //TODO: cancel the event makes player cannot place block
+        if (blockMaterial == Material.NOTE_BLOCK && action == Action.RIGHT_CLICK_BLOCK && ((NoteBlock) blockData).getInstrument() != Instrument.PIANO) {
             event.setCancelled(true);
+
+            if (item != null && item.getType().isBlock()) {
+                module.simulatePlayerPlaceBlock(player, event.getHand(), item, block, blockFace);
+            }
         }
         //Custom Tripwire Block
-        else if (material == Material.TRIPWIRE && action == Action.PHYSICAL) {
+        else if (blockMaterial == Material.TRIPWIRE && action == Action.PHYSICAL) {
             event.setCancelled(true);
         }
     }
@@ -122,9 +128,8 @@ public class ModdedBlockModuleListener implements Listener {
     public void onDamageAbort(BlockDamageAbortEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlock();
-        ModdedBlock moddedBlock = module.getBlock(block);
 
-        if (moddedBlock == null) {
+        if (module.isCustomBlock(block)) {
             return;
         }
 
@@ -141,10 +146,9 @@ public class ModdedBlockModuleListener implements Listener {
             event.setCancelled(true);
         } else {
             Block underBlock = event.getBlock().getRelative(BlockFace.DOWN);
-            ModdedBlock underModdedBlock = module.getBlock(underBlock);
 
             //If the block is a custom block, we don't change the instrument
-            if (underModdedBlock != null) {
+            if (module.isCustomBlock(underBlock)) {
                 return;
             }
 
